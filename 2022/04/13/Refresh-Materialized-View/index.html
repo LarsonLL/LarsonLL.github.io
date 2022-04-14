@@ -1,17 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang=en>
 <head>
   <meta charset="utf-8">
   
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
   
   <title>Refresh Materialized View | Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="refer toOracle 官方文档 Url : https:&#x2F;&#x2F;docs.oracle.com&#x2F;cd&#x2F;E11882_01&#x2F;server.112&#x2F;e25554&#x2F;refresh.htm#DWHSG03003 概述在创建 materialized view 的时候可以指定两种刷新方式  ON COMMIT在这种机制下，Materialized view 在每次commit 的时候都会自动 ref">
+  <meta name="description" content="refer to Oracle 官方文档 Url : https:&#x2F;&#x2F;docs.oracle.com&#x2F;cd&#x2F;E11882_01&#x2F;server.112&#x2F;e25554&#x2F;refresh.htm#DWHSG03003  概述 在创建 materialized view 的时候可以指定两种刷新方式  ON COMMIT 在这种机制下，Materialized view 在每次commit 的时候都会自动">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Refresh Materialized View">
 <meta property="og:url" content="http://example.com/2022/04/13/Refresh-Materialized-View/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="refer toOracle 官方文档 Url : https:&#x2F;&#x2F;docs.oracle.com&#x2F;cd&#x2F;E11882_01&#x2F;server.112&#x2F;e25554&#x2F;refresh.htm#DWHSG03003 概述在创建 materialized view 的时候可以指定两种刷新方式  ON COMMIT在这种机制下，Materialized view 在每次commit 的时候都会自动 ref">
+<meta property="og:description" content="refer to Oracle 官方文档 Url : https:&#x2F;&#x2F;docs.oracle.com&#x2F;cd&#x2F;E11882_01&#x2F;server.112&#x2F;e25554&#x2F;refresh.htm#DWHSG03003  概述 在创建 materialized view 的时候可以指定两种刷新方式  ON COMMIT 在这种机制下，Materialized view 在每次commit 的时候都会自动">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/Oracle/Refreshing+Materialized+View/DeterMining+PCT+Freshness.png">
 <meta property="article:published_time" content="2022-04-13T11:36:38.000Z">
@@ -20,91 +32,362 @@
 <meta property="article:tag" content="Oracle">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/Oracle/Refreshing+Materialized+View/DeterMining+PCT+Freshness.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://example.com/2022/04/13/Refresh-Materialized-View/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
   
-    <link rel="shortcut icon" href="/favicon.png">
-  
-  
-    
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
-
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
   
   
 <link rel="stylesheet" href="/css/style.css">
 
   
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
-
+  
+  
   
 <meta name="generator" content="Hexo 6.1.0"></head>
 
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Hexo</a>
-      </h1>
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
       
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/larsonll" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Larson</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Data Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Shanghai, China</small>
       </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
     </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">Repository</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">Books</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">Links</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/larsonll" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/cofess" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="https://twitter.com/iwebued" target="_blank" title="Twitter" data-toggle=tooltip data-placement=top><i class="icon icon-twitter"></i></a></li>
+        
+        <li><a href="https://www.behance.net/cofess" target="_blank" title="Behance" data-toggle=tooltip data-placement=top><i class="icon icon-behance"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
   </div>
 </header>
 
-      <div class="outer">
-        <section id="main"><article id="post-Refresh-Materialized-View" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/04/13/Refresh-Materialized-View/" class="article-date">
-  <time class="dt-published" datetime="2022-04-13T11:36:38.000Z" itemprop="datePublished">2022-04-13</time>
-</a>
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/" rel="tag">Oracle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Hadoop/" style="font-size: 13px;">Hadoop</a> <a href="/tags/Oracle/" style="font-size: 13px;">Oracle</a> <a href="/tags/spark/" style="font-size: 13px;">spark</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/13/Refresh-Materialized-View/" class="title">Refresh Materialized View</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-13T11:36:38.000Z" itemprop="datePublished">2022-04-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/13/Spark-Evn-Deployment-Spark-%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" class="title">Spark Evn Deployment(Spark 环境部署)</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-13T11:29:03.000Z" itemprop="datePublished">2022-04-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/" class="title">HDFS Architecture(HDFS 架构)</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-13T11:22:06.000Z" itemprop="datePublished">2022-04-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/13/blog-test/" class="title">blog test</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-13T06:09:24.000Z" itemprop="datePublished">2022-04-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/12/hello-world/" class="title">Hello World</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-12T10:03:52.260Z" itemprop="datePublished">2022-04-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
     
   </div>
-  <div class="article-inner">
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Refresh-Materialized-View" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
     
-    
-      <header class="article-header">
+    <div class="article-header">
+      
         
   
-    <h1 class="p-name article-title" itemprop="headline name">
+    <h1 class="article-title" itemprop="name">
       Refresh Materialized View
     </h1>
   
 
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/04/13/Refresh-Materialized-View/" class="article-date">
+	  <time datetime="2022-04-13T11:36:38.000Z" itemprop="datePublished">2022-04-13</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Oracle/" rel="tag">Oracle</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/04/13/Refresh-Materialized-View/#comments" class="article-comment-link">Comments</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
       
         <font face="黑体">
-
-<h1 id="refer-to"><a href="#refer-to" class="headerlink" title="refer to"></a>refer to</h1><p>Oracle 官方文档 Url : <a target="_blank" rel="noopener" href="https://docs.oracle.com/cd/E11882_01/server.112/e25554/refresh.htm#DWHSG03003">https://docs.oracle.com/cd/E11882_01/server.112/e25554/refresh.htm#DWHSG03003</a></p>
-<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在创建 materialized view 的时候可以指定两种刷新方式</p>
+<h1 id="refer-to"><a class="markdownIt-Anchor" href="#refer-to"></a> refer to</h1>
+<p>Oracle 官方文档 Url : <a target="_blank" rel="noopener" href="https://docs.oracle.com/cd/E11882_01/server.112/e25554/refresh.htm#DWHSG03003">https://docs.oracle.com/cd/E11882_01/server.112/e25554/refresh.htm#DWHSG03003</a></p>
+<h1 id="概述"><a class="markdownIt-Anchor" href="#概述"></a> 概述</h1>
+<p>在创建 materialized view 的时候可以指定两种刷新方式</p>
 <ul>
-<li>ON COMMIT<br>在这种机制下，Materialized view 在每次commit 的时候都会自动 refresh。</li>
-<li>ON DEMAND<br>在这中case下，Materialized view 只能通过call DBMS_MVIEW 这个package中的procedure才能进行refresh</li>
+<li>ON COMMIT<br />
+在这种机制下，Materialized view 在每次commit 的时候都会自动 refresh。</li>
+<li>ON DEMAND<br />
+在这中case下，Materialized view 只能通过call DBMS_MVIEW 这个package中的procedure才能进行refresh</li>
 </ul>
 <p>DBMS_MVIEW 提供3种刷新方式</p>
 <ul>
@@ -112,34 +395,39 @@
 <li>DBMS_MVIEW.REFRESH_ALL_MVIEWS  # 刷新所有的物化视图</li>
 <li>DBMS_MVIEW.REFRESH_DEPENDENT  # 刷新所有依赖于指定的主表、物化视图（可以是多个）的物化视图</li>
 </ul>
-<h4 id="Note"><a href="#Note" class="headerlink" title=" Note: "></a><font color=red size=6 > Note: </font></h4><ul>
-<li>由于刷新物化视图操作需要临时空间来重建索引，并且可能需要额外的空间来执行刷新操作本身，所以不需要频繁的进行刷新操作。因此如果没有及时刷新物化视图的话，需要考虑查询重写的问题。 </li>
+<h4 id="font-colorred-size6-note-font"><a class="markdownIt-Anchor" href="#font-colorred-size6-note-font"></a> <font color=red size=6 > Note: </font></h4>
+<ul>
+<li>由于刷新物化视图操作需要临时空间来重建索引，并且可能需要额外的空间来执行刷新操作本身，所以不需要频繁的进行刷新操作。因此如果没有及时刷新物化视图的话，需要考虑查询重写的问题。</li>
 <li>可以通过 <code>ALTER SYSTEM SET QUERY_REWRITE_ENABLED = FALSE or TRUE</code> 来禁用或者启用查询重写操作。</li>
 <li>Oracle 版本 10 以下 默认为fales ， 10 以上 为TRUE</li>
 <li>If you anticipate performing insert, update or delete operations on tables referenced by a materialized view concurrently with the refresh of that materialized view, and that materialized view includes joins and aggregation, Oracle recommends you use ON COMMIT fast refresh rather than ON DEMAND fast refresh.(如果预计在物化视图刷新的同时对物化视图引用的表执行插入，更新或删除操作，并且该物化视图包含连接和聚合，Oracle建议您使用ON COMMIT快速刷新而不是ON DEMAND快速刷新。)</li>
 </ul>
-<h1 id="Refresh-method-4种"><a href="#Refresh-method-4种" class="headerlink" title="Refresh method (4种)"></a>Refresh method (4种)</h1><h2 id="Complete-Refresh"><a href="#Complete-Refresh" class="headerlink" title="Complete Refresh"></a>Complete Refresh</h2><ul>
+<h1 id="refresh-method-4种"><a class="markdownIt-Anchor" href="#refresh-method-4种"></a> Refresh method (4种)</h1>
+<h2 id="complete-refresh"><a class="markdownIt-Anchor" href="#complete-refresh"></a> Complete Refresh</h2>
+<ul>
 <li>build immediate 在物化视图第一次创建的时候会发生完全刷新，除非创建的物化视图引用的表还没有被创建.</li>
 <li>build deferred  创建的物化视图，第一时间是不会进行完全刷新，但必须在第一次使用之前进行一次完整的刷新.</li>
 <li>刷新过程需要读取细节表，计算物化视图结果，非常耗时，尤其是当需要读取大量数据时。</li>
 </ul>
-<h2 id="Fast-Refresh"><a href="#Fast-Refresh" class="headerlink" title="Fast Refresh"></a>Fast Refresh</h2><ul>
+<h2 id="fast-refresh"><a class="markdownIt-Anchor" href="#fast-refresh"></a> Fast Refresh</h2>
+<ul>
 <li>对比上面的完整刷新，快速刷新物化视图不需要重新计算整个物化视图，而是将更改现有的数据，所以会比较快</li>
 </ul>
-<h2 id="Partition-Change-Tracking-PCT-Refresh"><a href="#Partition-Change-Tracking-PCT-Refresh" class="headerlink" title="Partition Change Tracking (PCT) Refresh"></a>Partition Change Tracking (PCT) Refresh</h2><ul>
-<li>当物化视图引用的表有分区操作的时候，只能使用快速刷新(Fast Refresh) ,但是要满足PCT 的所有条件才允许基于PC的刷新。</li>
-</ul>
-<p>  -对于没有分区的表，如果使用Fast Refresh (method &#x3D;&gt; ‘F’),Oracle在执行之前会尝试基于log的快速刷新。</p>
+<h2 id="partition-change-tracking-pct-refresh"><a class="markdownIt-Anchor" href="#partition-change-tracking-pct-refresh"></a> Partition Change Tracking (PCT) Refresh</h2>
 <ul>
+<li>当物化视图引用的表有分区操作的时候，只能使用快速刷新(Fast Refresh) ,但是要满足PCT 的所有条件才允许基于PC的刷新。<br />
+-对于没有分区的表，如果使用Fast Refresh (method =&gt; ‘F’),Oracle在执行之前会尝试基于log的快速刷新。</li>
 <li>类似的当使用Force方法刷新的时候，Oracle 会按如下顺序选择Refresh方式: log-based fast refresh , PCT refresh , complete</li>
-<li>当然你也可以指定PCT刷新方式（method &#x3D;&gt; ‘P’）</li>
+<li>当然你也可以指定PCT刷新方式（method =&gt; ‘P’）</li>
 </ul>
-<h2 id="ON-COMMIT-Refresh"><a href="#ON-COMMIT-Refresh" class="headerlink" title="ON COMMIT Refresh"></a>ON COMMIT Refresh</h2><ul>
+<h2 id="on-commit-refresh"><a class="markdownIt-Anchor" href="#on-commit-refresh"></a> ON COMMIT Refresh</h2>
+<ul>
 <li>使用这种方法自动刷新物化视图，当事物更新了一个物化视图引用的表时，这些changes会自动刷新到对应的物化视图上。</li>
 <li>好处是 不需要定时刷新物化视图</li>
 <li>缺点 commit 需要的时间比较长。不过如果再数据仓库中应该不是问题，因为不太可能并发进程，所以再OLTP中要避免这种MV。</li>
 </ul>
-<h2 id="Manual-Refresh-Using-The-DBMS-MVIEW-package"><a href="#Manual-Refresh-Using-The-DBMS-MVIEW-package" class="headerlink" title="Manual Refresh Using The DBMS_MVIEW package"></a>Manual Refresh Using The DBMS_MVIEW package</h2><ul>
+<h2 id="manual-refresh-using-the-dbms_mview-package"><a class="markdownIt-Anchor" href="#manual-refresh-using-the-dbms_mview-package"></a> Manual Refresh Using The DBMS_MVIEW package</h2>
+<ul>
 <li>刷新物化视图时，可以指定4中方法之一，入下图所示</li>
 </ul>
 <table>
@@ -150,7 +438,8 @@
 <th>Description</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>COMPLETE</td>
 <td>C</td>
 <td>通过重新计算物化视图定义的查询来刷新</td>
@@ -170,29 +459,47 @@
 <td>F&amp;？</td>
 <td>先尝试快速刷新，如果不符合快速刷新条件，就会进行完全刷新。优化器选择的刷新基于日子的FAST ，FAST_PCT 和 COMPLETE</td>
 </tr>
-</tbody></table>
-<h1 id="Refresh-procedure-常用的3种"><a href="#Refresh-procedure-常用的3种" class="headerlink" title="Refresh procedure (常用的3种)"></a>Refresh procedure (常用的3种)</h1><h2 id="调用DBMS-MVIEW-REFRESH刷新Materialized-View"><a href="#调用DBMS-MVIEW-REFRESH刷新Materialized-View" class="headerlink" title="调用DBMS_MVIEW.REFRESH刷新Materialized View"></a>调用<code>DBMS_MVIEW.REFRESH</code>刷新Materialized View</h2><ul>
+</tbody>
+</table>
+<h1 id="refresh-procedure-常用的3种"><a class="markdownIt-Anchor" href="#refresh-procedure-常用的3种"></a> Refresh procedure (常用的3种)</h1>
+<h2 id="调用dbms_mviewrefresh刷新materialized-view"><a class="markdownIt-Anchor" href="#调用dbms_mviewrefresh刷新materialized-view"></a> 调用<code>DBMS_MVIEW.REFRESH</code>刷新Materialized View</h2>
+<ul>
 <li>如果多个物化视图一起刷新需要用逗号分割。(list&amp;tab)</li>
 <li>刷新方法: F-Fast , P-Fast_PCT , ? - Force , C-Complete (Method)</li>
 <li>使用回滚段 (rollback_seg) 默认为 NULL</li>
 <li>在错误之后是否进行刷新(TRUE or FALSE)。True: 那么需要将 <code>number_of_failure</code> 设置一个失败以后刷新的次数，类似于重新请求。FALSE: 默认Refresh 在遇到第一个错误的时候就会停止，并且列表剩余的物化视图不会刷新。 （refresh_after_errors） 默认为FALSE</li>
 <li>下面的4个参数，用来进行 replication 过程的时候，一般再数据仓库的刷新时候 依次设置为 <code>FALSE,0,0,0</code></li>
-<li>Atomic refresh (TRUE or FALSE) atomic_refresh 默认为TRUE  TRUE: 所有的刷新操作在一个事物中完成. FALSE: 在单独的事务中刷新每个指定的物化视图。<h4 id="For-exampl"><a href="#For-exampl" class="headerlink" title="For exampl"></a>For exampl</h4></li>
-<li>fast refresh  MV : cal_month_sales_mv <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DBMS_MVIEW.REFRESH(<span class="string">&#x27;CAL_MONTH_SALES_MV&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="literal">TRUE</span>, <span class="literal">FALSE</span>, <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="literal">FALSE</span>);</span><br></pre></td></tr></table></figure></li>
-<li>多个物化视图刷新:<code>CAL_MONTH_SALES_MV</code> 完全刷新 <code>FWEEK_PSCAT_SALES_MV</code> 快速刷新 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DBMS_MVIEW.REFRESH(<span class="string">&#x27;CAL_MONTH_SALES_MV, FWEEK_PSCAT_SALES_MV&#x27;</span>, <span class="string">&#x27;CF&#x27;</span>, <span class="string">&#x27;&#x27;</span>, </span><br><span class="line"> <span class="literal">TRUE</span>, <span class="literal">FALSE</span>, <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="literal">FALSE</span>);</span><br></pre></td></tr></table></figure>
-<h4 id="Note-1"><a href="#Note-1" class="headerlink" title=" Note: "></a><font color=red size=6 > Note: </font></h4></li>
+<li>Atomic refresh (TRUE or FALSE) atomic_refresh 默认为TRUE  TRUE: 所有的刷新操作在一个事物中完成. FALSE: 在单独的事务中刷新每个指定的物化视图。</li>
+</ul>
+<h4 id="for-exampl"><a class="markdownIt-Anchor" href="#for-exampl"></a> For exampl</h4>
+<ul>
+<li>fast refresh  MV : cal_month_sales_mv</li>
+</ul>
+ <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DBMS_MVIEW.REFRESH(<span class="string">&#x27;CAL_MONTH_SALES_MV&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="literal">TRUE</span>, <span class="literal">FALSE</span>, <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="literal">FALSE</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>多个物化视图刷新:<code>CAL_MONTH_SALES_MV</code> 完全刷新 <code>FWEEK_PSCAT_SALES_MV</code> 快速刷新</li>
+</ul>
+ <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DBMS_MVIEW.REFRESH(<span class="string">&#x27;CAL_MONTH_SALES_MV, FWEEK_PSCAT_SALES_MV&#x27;</span>, <span class="string">&#x27;CF&#x27;</span>, <span class="string">&#x27;&#x27;</span>, </span><br><span class="line"> <span class="literal">TRUE</span>, <span class="literal">FALSE</span>, <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>, <span class="literal">FALSE</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="font-colorred-size6-note-font-2"><a class="markdownIt-Anchor" href="#font-colorred-size6-note-font-2"></a> <font color=red size=6 > Note: </font></h4>
+<ul>
 <li>如果未指定refresh方法，则使用物化视图定义中指定的默认刷新方法。</li>
 </ul>
-<h2 id="调用DMBS-MVIEW-REFRESH-ALL-MVIEWS刷新所有的Materialized-View"><a href="#调用DMBS-MVIEW-REFRESH-ALL-MVIEWS刷新所有的Materialized-View" class="headerlink" title="调用DMBS_MVIEW.REFRESH_ALL_MVIEWS刷新所有的Materialized View"></a>调用<code>DMBS_MVIEW.REFRESH_ALL_MVIEWS</code>刷新所有的Materialized View</h2><ul>
+<h2 id="调用dmbs_mviewrefresh_all_mviews刷新所有的materialized-view"><a class="markdownIt-Anchor" href="#调用dmbs_mviewrefresh_all_mviews刷新所有的materialized-view"></a> 调用<code>DMBS_MVIEW.REFRESH_ALL_MVIEWS</code>刷新所有的Materialized View</h2>
+<ul>
 <li>这个Procedure 会刷新所有的物化视图，如果其中有未成功刷新的物化视图，会返回失败的次数。</li>
 </ul>
-<h4 id="Parameter"><a href="#Parameter" class="headerlink" title="Parameter"></a>Parameter</h4><ul>
+<h4 id="parameter"><a class="markdownIt-Anchor" href="#parameter"></a> Parameter</h4>
+<ul>
 <li>失败数量，这是一个输出的变量OUT () number_of_failures</li>
 <li>刷新方法，F-Fast, P-Fast_PCT, ?-Force, C-Complete</li>
 <li>在错误之后是否进行刷新(TRUE or FALSE)。True: 那么需要将 <code>number_of_failure</code> 设置一个失败以后刷新的次数，类似于重新请求。FALSE: 默认Refresh 在遇到第一个错误的时候就会停止，并且列表剩余的物化视图不会刷新。 （refresh_after_errors） 默认为FALSE，</li>
-<li>Atomic refresh (TRUE or FALSE) atomic_refresh 默认为TRUE  TRUE: 所有的刷新操作在一个事物中完成. FALSE: 在单独的事务中刷新每个指定的物化视图。<h4 id="For-Example"><a href="#For-Example" class="headerlink" title="For Example"></a>For Example</h4>  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DBMS_MVIEW.REFRESH_ALL_MVIEWS(failures,<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;&#x27;</span>, <span class="literal">TRUE</span>, <span class="literal">FALSE</span>);</span><br></pre></td></tr></table></figure></li>
+<li>Atomic refresh (TRUE or FALSE) atomic_refresh 默认为TRUE  TRUE: 所有的刷新操作在一个事物中完成. FALSE: 在单独的事务中刷新每个指定的物化视图。</li>
 </ul>
-<h2 id="调用-DMBS-MVIEW-REFRESH-DEPENDENT-刷新那些依赖于特定表或者表列表的物化视图。"><a href="#调用-DMBS-MVIEW-REFRESH-DEPENDENT-刷新那些依赖于特定表或者表列表的物化视图。" class="headerlink" title="调用 DMBS_MVIEW.REFRESH_DEPENDENT 刷新那些依赖于特定表或者表列表的物化视图。"></a>调用 <code>DMBS_MVIEW.REFRESH_DEPENDENT</code> 刷新那些依赖于特定表或者表列表的物化视图。</h2><h4 id="Parameter-1"><a href="#Parameter-1" class="headerlink" title="Parameter"></a>Parameter</h4><ul>
+<h4 id="for-example"><a class="markdownIt-Anchor" href="#for-example"></a> For Example</h4>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DBMS_MVIEW.REFRESH_ALL_MVIEWS(failures,<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;&#x27;</span>, <span class="literal">TRUE</span>, <span class="literal">FALSE</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="调用-dmbs_mviewrefresh_dependent-刷新那些依赖于特定表或者表列表的物化视图"><a class="markdownIt-Anchor" href="#调用-dmbs_mviewrefresh_dependent-刷新那些依赖于特定表或者表列表的物化视图"></a> 调用 <code>DMBS_MVIEW.REFRESH_DEPENDENT</code> 刷新那些依赖于特定表或者表列表的物化视图。</h2>
+<h4 id="parameter-2"><a class="markdownIt-Anchor" href="#parameter-2"></a> Parameter</h4>
+<ul>
 <li>失败数量，这是一个输出的变量OUT (number_of_failures)</li>
 <li>相关的表 (list&amp;tab)</li>
 <li>刷新方法，F-Fast, P-Fast_PCT, ?-Force, C-Complete  (Method)</li>
@@ -201,173 +508,266 @@
 <li>Atomic refresh (TRUE or FALSE) atomic_refresh 默认为TRUE 同上</li>
 <li>是否嵌套 nested 默认为 FALSE 。 如果是TRUE 会根据依赖项顺序刷新指定表集的所有相关物化视图，以确保物化视图相对于底层基表而言是新鲜的。</li>
 </ul>
-<h4 id="For-Example-1"><a href="#For-Example-1" class="headerlink" title="For Example"></a>For Example</h4><pre><code><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">    DBMS_MVIEW.REFRESH_DEPENDENT(failures, <span class="string">&#x27;CUSTOMERS&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="literal">FALSE</span>, <span class="literal">FALSE</span> );</span><br><span class="line">    ```  </span><br><span class="line"></span><br><span class="line"># 附录</span><br><span class="line">## 如何确定物化视图是否可以进行快速刷新</span><br><span class="line">  <span class="operator">-</span> `DBMS_ADVISOR.TUNE_MVIEW` </span><br><span class="line"></span><br><span class="line">## 监控执行的刷新</span><br><span class="line">  ```<span class="keyword">sql</span></span><br><span class="line">  <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> V$SESSION_LONGOPS;</span><br><span class="line">  <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> DBA_JOBS_RUNNING; <span class="comment">--查看那个作业在那个队列上的进度</span></span><br></pre></td></tr></table></figure>
+<h4 id="for-example-2"><a class="markdownIt-Anchor" href="#for-example-2"></a> For Example</h4>
+<pre><code><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">    DBMS_MVIEW.REFRESH_DEPENDENT(failures, <span class="string">&#x27;CUSTOMERS&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="literal">FALSE</span>, <span class="literal">FALSE</span> );</span><br><span class="line">    ```  </span><br><span class="line"></span><br><span class="line"># 附录</span><br><span class="line">## 如何确定物化视图是否可以进行快速刷新</span><br><span class="line">  <span class="operator">-</span> `DBMS_ADVISOR.TUNE_MVIEW` </span><br><span class="line"></span><br><span class="line">## 监控执行的刷新</span><br><span class="line">  ```<span class="keyword">sql</span></span><br><span class="line">  <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> V$SESSION_LONGOPS;</span><br><span class="line">  <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> DBA_JOBS_RUNNING; <span class="comment">--查看那个作业在那个队列上的进度</span></span><br></pre></td></tr></table></figure>
 </code></pre>
-<h2 id="检查物化视图的状态"><a href="#检查物化视图的状态" class="headerlink" title="检查物化视图的状态"></a>检查物化视图的状态</h2><p>  oracle提供了3个视图用来检查物化视图的状态.</p>
+<h2 id="检查物化视图的状态"><a class="markdownIt-Anchor" href="#检查物化视图的状态"></a> 检查物化视图的状态</h2>
+<p>oracle提供了3个视图用来检查物化视图的状态.</p>
 <ul>
 <li>DBA_MVEIWS</li>
 <li>ALL_MVIEWS</li>
 <li>USER_MVIEWS</li>
 </ul>
-<h5 id="检查物化视图是新的还是旧的"><a href="#检查物化视图是新的还是旧的" class="headerlink" title="检查物化视图是新的还是旧的"></a>检查物化视图是新的还是旧的</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME, STALENESS, LAST_REFRESH_TYPE, COMPILE_STATE </span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEWS <span class="keyword">ORDER</span> <span class="keyword">BY</span> MVIEW_NAME;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME            STALENESS      LAST_REF       COMPILE_STATE</span><br><span class="line"><span class="comment">----------            ---------      --------       -------------</span></span><br><span class="line">CUST_MTH_SALES_MV     NEEDS_COMPILE  FAST           NEEDS_COMPILE</span><br><span class="line">PROD_YR_SALES_MV      FRESH          FAST           VALID</span><br></pre></td></tr></table></figure>
+<h5 id="检查物化视图是新的还是旧的"><a class="markdownIt-Anchor" href="#检查物化视图是新的还是旧的"></a> 检查物化视图是新的还是旧的</h5>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME, STALENESS, LAST_REFRESH_TYPE, COMPILE_STATE </span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEWS <span class="keyword">ORDER</span> <span class="keyword">BY</span> MVIEW_NAME;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME            STALENESS      LAST_REF       COMPILE_STATE</span><br><span class="line"><span class="comment">----------            ---------      --------       -------------</span></span><br><span class="line">CUST_MTH_SALES_MV     NEEDS_COMPILE  FAST           NEEDS_COMPILE</span><br><span class="line">PROD_YR_SALES_MV      FRESH          FAST           VALID</span><br></pre></td></tr></table></figure>
 <p>如果 <code>COMPILE_STATE</code> 是 <code>NEEDS_COMPILE</code> ,那么这条信息的其他列都不准确。</p>
 <ul>
-<li>要重新将物化视图编译，执行下面语句:<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> MATERIALIZED <span class="keyword">VIEW</span> [materialized_view_name] COMPILE;</span><br></pre></td></tr></table></figure>
-<h5 id="可以使用下面的几个视图来检查分区是否新鲜"><a href="#可以使用下面的几个视图来检查分区是否新鲜" class="headerlink" title="可以使用下面的几个视图来检查分区是否新鲜"></a>可以使用下面的几个视图来检查分区是否新鲜</h5></li>
+<li>要重新将物化视图编译，执行下面语句:</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> MATERIALIZED <span class="keyword">VIEW</span> [materialized_view_name] COMPILE;</span><br></pre></td></tr></table></figure>
+<h5 id="可以使用下面的几个视图来检查分区是否新鲜"><a class="markdownIt-Anchor" href="#可以使用下面的几个视图来检查分区是否新鲜"></a> 可以使用下面的几个视图来检查分区是否新鲜</h5>
+<ul>
 <li>USER_MVIEWS 确定物化视图的分区更改跟踪PCT信息</li>
 <li>USER_MVIEW_DETAIL_RELATIONS 显示明细表的分区信息。</li>
 <li>USER_MVIEW_DETAIL_PARTITION 确定那些分区是新的。</li>
 <li>USER_MVIEW_DETAIL_SUBPARTITION 确定那些子分区是新的。</li>
 </ul>
-<p>下图展示了一个范围列表分区表和一个基于它的物化视图。 </p>
+<p>下图展示了一个范围列表分区表和一个基于它的物化视图。</p>
 <ul>
 <li>分区 P1，P2,P3,P4</li>
-<li>子分区 SP1，SP2，SP3<br><img src="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/Oracle/Refreshing+Materialized+View/DeterMining+PCT+Freshness.png" alt="enter description here"></li>
+<li>子分区 SP1，SP2，SP3<br />
+<img src="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/Oracle/Refreshing+Materialized+View/DeterMining+PCT+Freshness.png" alt="enter description here" /></li>
 </ul>
 <p>下面是一些用上面的视图来确认MV的是否新鲜</p>
-<h5 id="通过USER-MVIEWS-查询视图的PCT信息。"><a href="#通过USER-MVIEWS-查询视图的PCT信息。" class="headerlink" title="通过USER_MVIEWS 查询视图的PCT信息。"></a>通过<code>USER_MVIEWS</code> 查询视图的PCT信息。</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME, NUM_PCT_TABLES, NUM_FRESH_PCT_REGIONS,</span><br><span class="line">   NUM_STALE_PCT_REGIONS</span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEWS</span><br><span class="line"><span class="keyword">WHERE</span> MVIEW_NAME <span class="operator">=</span> MV1;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME NUM_PCT_TABLES NUM_FRESH_PCT_REGIONS NUM_STALE_PCT_REGIONS</span><br><span class="line"><span class="comment">---------- -------------- --------------------- ---------------------</span></span><br><span class="line">       MV1              <span class="number">1</span>                     <span class="number">9</span>                     <span class="number">3</span></span><br></pre></td></tr></table></figure>
-<h5 id="通过-USER-MVIEW-DETAIL-RELATIONS-查询视图的PCT信息"><a href="#通过-USER-MVIEW-DETAIL-RELATIONS-查询视图的PCT信息" class="headerlink" title="通过 USER_MVIEW_DETAIL_RELATIONS  查询视图的PCT信息"></a>通过 <code>USER_MVIEW_DETAIL_RELATIONS </code> 查询视图的PCT信息</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME, DETAILOBJ_NAME, DETAILOBJ_PCT,</span><br><span class="line">   NUM_FRESH_PCT_PARTITIONS, NUM_STALE_PCT_PARTITIONS</span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEW_DETAIL_RELATIONS</span><br><span class="line"><span class="keyword">WHERE</span> MVIEW_NAME <span class="operator">=</span> MV1;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME  DETAILOBJ_NAME  DETAIL_OBJ_PCT  NUM_FRESH_PCT_PARTITIONS  NUM_STALE_PCT_PARTITIONS</span><br><span class="line"><span class="comment">----------  --------------  --------------  ------------------------  ------------------------</span></span><br><span class="line">        MV1             T1               Y                         <span class="number">3</span>                         <span class="number">1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h5 id="通过-USER-MVIEW-DETAIL-PARTITION-查询视图的PCT信息"><a href="#通过-USER-MVIEW-DETAIL-PARTITION-查询视图的PCT信息" class="headerlink" title="通过 USER_MVIEW_DETAIL_PARTITION   查询视图的PCT信息"></a>通过 <code>USER_MVIEW_DETAIL_PARTITION  </code> 查询视图的PCT信息</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME,DETAILOBJ_NAME,DETAIL_PARTITION_NAME,</span><br><span class="line">   DETAIL_PARTITION_POSITION,FRESHNESS</span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEW_DETAIL_PARTITION</span><br><span class="line"><span class="keyword">WHERE</span> MVIEW_NAME <span class="operator">=</span> MV1;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME  DETAILOBJ_NAME  DETAIL_PARTITION_NAME  DETAIL_PARTITION_POSITION  FRESHNESS</span><br><span class="line"><span class="comment">----------  --------------  ---------------------  -------------------------  ---------</span></span><br><span class="line">       MV1               T1                    P1                          <span class="number">1</span>      FRESH</span><br><span class="line">       MV1               T1                    P2                          <span class="number">2</span>      FRESH</span><br><span class="line">       MV1               T1                    P3                          <span class="number">3</span>      STALE</span><br><span class="line">       MV1               T1                    P4                          <span class="number">4</span>      FRESH</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h5 id="通过-USER-MVIEW-DETAIL-SUBPARTITION-查询视图的PCT信息"><a href="#通过-USER-MVIEW-DETAIL-SUBPARTITION-查询视图的PCT信息" class="headerlink" title="通过 USER_MVIEW_DETAIL_SUBPARTITION    查询视图的PCT信息"></a>通过 <code>USER_MVIEW_DETAIL_SUBPARTITION   </code> 查询视图的PCT信息</h5><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME,DETAILOBJ_NAME,DETAIL_PARTITION_NAME, DETAIL_SUBPARTITION_NAME,</span><br><span class="line">    DETAIL_SUBPARTITION_POSITION,FRESHNESS</span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEW_DETAIL_SUBPARTITION</span><br><span class="line"><span class="keyword">WHERE</span> MVIEW_NAME <span class="operator">=</span> MV1;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME DETAILOBJ DETAIL_PARTITION DETAIL_SUBPARTITION_NAME DETAIL_SUBPARTITION_POS FRESHNESS</span><br><span class="line"><span class="comment">---------- --------- ---------------- ------------------------ ----------------------- ---------</span></span><br><span class="line">       MV1        T1               P1                      SP1                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P1                      SP2                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P1                      SP3                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P2                      SP1                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P2                      SP2                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P2                      SP3                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P3                      SP1                       <span class="number">1</span>     STALE</span><br><span class="line">       MV1        T1               P3                      SP2                       <span class="number">1</span>     STALE</span><br><span class="line">       MV1        T1               P3                      SP3                       <span class="number">1</span>     STALE</span><br><span class="line">       MV1        T1               P4                      SP1                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P4                      SP2                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P4                      SP3                       <span class="number">1</span>     FRESH</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
+<h5 id="通过user_mviews-查询视图的pct信息"><a class="markdownIt-Anchor" href="#通过user_mviews-查询视图的pct信息"></a> 通过<code>USER_MVIEWS</code> 查询视图的PCT信息。</h5>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME, NUM_PCT_TABLES, NUM_FRESH_PCT_REGIONS,</span><br><span class="line">   NUM_STALE_PCT_REGIONS</span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEWS</span><br><span class="line"><span class="keyword">WHERE</span> MVIEW_NAME <span class="operator">=</span> MV1;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME NUM_PCT_TABLES NUM_FRESH_PCT_REGIONS NUM_STALE_PCT_REGIONS</span><br><span class="line"><span class="comment">---------- -------------- --------------------- ---------------------</span></span><br><span class="line">       MV1              <span class="number">1</span>                     <span class="number">9</span>                     <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<h5 id="通过-user_mview_detail_relations-查询视图的pct信息"><a class="markdownIt-Anchor" href="#通过-user_mview_detail_relations-查询视图的pct信息"></a> 通过 <code>USER_MVIEW_DETAIL_RELATIONS</code> 查询视图的PCT信息</h5>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME, DETAILOBJ_NAME, DETAILOBJ_PCT,</span><br><span class="line">   NUM_FRESH_PCT_PARTITIONS, NUM_STALE_PCT_PARTITIONS</span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEW_DETAIL_RELATIONS</span><br><span class="line"><span class="keyword">WHERE</span> MVIEW_NAME <span class="operator">=</span> MV1;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME  DETAILOBJ_NAME  DETAIL_OBJ_PCT  NUM_FRESH_PCT_PARTITIONS  NUM_STALE_PCT_PARTITIONS</span><br><span class="line"><span class="comment">----------  --------------  --------------  ------------------------  ------------------------</span></span><br><span class="line">        MV1             T1               Y                         <span class="number">3</span>                         <span class="number">1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h5 id="通过-user_mview_detail_partition-查询视图的pct信息"><a class="markdownIt-Anchor" href="#通过-user_mview_detail_partition-查询视图的pct信息"></a> 通过 <code>USER_MVIEW_DETAIL_PARTITION</code> 查询视图的PCT信息</h5>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME,DETAILOBJ_NAME,DETAIL_PARTITION_NAME,</span><br><span class="line">   DETAIL_PARTITION_POSITION,FRESHNESS</span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEW_DETAIL_PARTITION</span><br><span class="line"><span class="keyword">WHERE</span> MVIEW_NAME <span class="operator">=</span> MV1;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME  DETAILOBJ_NAME  DETAIL_PARTITION_NAME  DETAIL_PARTITION_POSITION  FRESHNESS</span><br><span class="line"><span class="comment">----------  --------------  ---------------------  -------------------------  ---------</span></span><br><span class="line">       MV1               T1                    P1                          <span class="number">1</span>      FRESH</span><br><span class="line">       MV1               T1                    P2                          <span class="number">2</span>      FRESH</span><br><span class="line">       MV1               T1                    P3                          <span class="number">3</span>      STALE</span><br><span class="line">       MV1               T1                    P4                          <span class="number">4</span>      FRESH</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h5 id="通过-user_mview_detail_subpartition-查询视图的pct信息"><a class="markdownIt-Anchor" href="#通过-user_mview_detail_subpartition-查询视图的pct信息"></a> 通过 <code>USER_MVIEW_DETAIL_SUBPARTITION</code> 查询视图的PCT信息</h5>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MVIEW_NAME,DETAILOBJ_NAME,DETAIL_PARTITION_NAME, DETAIL_SUBPARTITION_NAME,</span><br><span class="line">    DETAIL_SUBPARTITION_POSITION,FRESHNESS</span><br><span class="line"><span class="keyword">FROM</span> USER_MVIEW_DETAIL_SUBPARTITION</span><br><span class="line"><span class="keyword">WHERE</span> MVIEW_NAME <span class="operator">=</span> MV1;</span><br><span class="line"></span><br><span class="line">MVIEW_NAME DETAILOBJ DETAIL_PARTITION DETAIL_SUBPARTITION_NAME DETAIL_SUBPARTITION_POS FRESHNESS</span><br><span class="line"><span class="comment">---------- --------- ---------------- ------------------------ ----------------------- ---------</span></span><br><span class="line">       MV1        T1               P1                      SP1                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P1                      SP2                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P1                      SP3                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P2                      SP1                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P2                      SP2                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P2                      SP3                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P3                      SP1                       <span class="number">1</span>     STALE</span><br><span class="line">       MV1        T1               P3                      SP2                       <span class="number">1</span>     STALE</span><br><span class="line">       MV1        T1               P3                      SP3                       <span class="number">1</span>     STALE</span><br><span class="line">       MV1        T1               P4                      SP1                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P4                      SP2                       <span class="number">1</span>     FRESH</span><br><span class="line">       MV1        T1               P4                      SP3                       <span class="number">1</span>     FRESH</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 </font>
 
-
       
     </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2022/04/13/Refresh-Materialized-View/" data-id="cl1xidjrx0003jgvp4jxd7lxp" data-title="Refresh Materialized View" class="article-share-link">Share</a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Oracle/" rel="tag">Oracle</a></li></ul>
-
-    </footer>
-  </div>
-  
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
     
-<nav id="article-nav">
-  
-  
-    <a href="/2022/04/13/Spark-Evn-Deployment-Spark-%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Spark Evn Deployment(Spark 环境部署)</div>
-    </a>
-  
-</nav>
-
-  
-</article>
-
-
-</section>
-        
-          <aside id="sidebar">
-  
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://example.com/2022/04/13/Refresh-Materialized-View/" title="Refresh Materialized View" target="_blank" rel="external">http://example.com/2022/04/13/Refresh-Materialized-View/</a>
+    </li>
     
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/" rel="tag">Oracle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li></ul>
-    </div>
-  </div>
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
 
 
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Oracle/" style="font-size: 10px;">Oracle</a> <a href="/tags/spark/" style="font-size: 10px;">spark</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2022/04/13/Refresh-Materialized-View/">Refresh Materialized View</a>
-          </li>
-        
-          <li>
-            <a href="/2022/04/13/Spark-Evn-Deployment-Spark-%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/">Spark Evn Deployment(Spark 环境部署)</a>
-          </li>
-        
-          <li>
-            <a href="/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/">HDFS Architecture(HDFS 架构)</a>
-          </li>
-        
-          <li>
-            <a href="/2022/04/13/blog-test/">blog test</a>
-          </li>
-        
-          <li>
-            <a href="/2022/04/12/hello-world/">Hello World</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/larsonll" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
       </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      
-      &copy; 2022 John Doe<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
-    </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/larsonll" target="_blank"><span class="text-dark">Larson</span><small class="ml-1x">Data Developer &amp; Designer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
   </div>
-</footer>
+</div>
+
 
     </div>
-    <nav id="mobile-nav">
+  </article>
   
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
     
-
-
-<script src="/js/jquery-3.4.1.min.js"></script>
-
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
 
 
   
-<script src="/fancybox/jquery.fancybox.min.js"></script>
+</div>
 
-
-
-
-<script src="/js/script.js"></script>
-
-
-
-
-
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2022/04/13/Spark-Evn-Deployment-Spark-%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" title="Spark Evn Deployment(Spark 环境部署)"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>$</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
   </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>Maybe you could buy me a cup of coffee.</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="Scan Qrcode" title="Scan" />
+              </div>
+              <p class="text-muted mv">Scan this qrcode</p>
+              <p class="text-grey">Open alipay app scan this qrcode, buy me a coffee!</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="Scan Qrcode" title="Scan" />
+              </div>
+              <p class="text-muted mv">Scan this qrcode</p>
+              <p class="text-grey">Open wechat app scan this qrcode, buy me a coffee!</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> alipay</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> wechat payment</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/larsonll" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/cofess" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="https://twitter.com/iwebued" target="_blank" title="Twitter" data-toggle=tooltip data-placement=top><i class="icon icon-twitter"></i></a></li>
+        
+        <li><a href="https://www.behance.net/cofess" target="_blank" title="Behance" data-toggle=tooltip data-placement=top><i class="icon icon-behance"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
 </body>
 </html>

@@ -1,17 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang=en>
 <head>
   <meta charset="utf-8">
   
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
   
   <title>HDFS Architecture(HDFS 架构) | Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="HDFS有一个主&#x2F;从架构，一个HDFS集群由一个单一的NameNode，它是管理文件系统命名空间的主服务器，并管理客户对文件的访问。NameNode执行文件系统命名空间操作，如打开，关闭和重命名文件和目录。它还确定块到DataNode的映射关系。  此外，还有许多的DataNode(通常每个节点一个)，它们管理所在的节点的数据存储。DataNodes负责处理来自Clients的读写请">
+  <meta name="description" content="HDFS有一个主&#x2F;从架构，一个HDFS集群由一个单一的NameNode，它是管理文件系统命名空间的主服务器，并管理客户对文件的访问。NameNode执行文件系统命名空间操作，如打开，关闭和重命名文件和目录。它还确定块到DataNode的映射关系。   此外，还有许多的DataNode(通常每个节点一个)，它们管理所在的节点的数据存储。DataNodes负责处理来自Clients的读写请求。同">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HDFS Architecture(HDFS 架构)">
 <meta property="og:url" content="http://example.com/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="HDFS有一个主&#x2F;从架构，一个HDFS集群由一个单一的NameNode，它是管理文件系统命名空间的主服务器，并管理客户对文件的访问。NameNode执行文件系统命名空间操作，如打开，关闭和重命名文件和目录。它还确定块到DataNode的映射关系。  此外，还有许多的DataNode(通常每个节点一个)，它们管理所在的节点的数据存储。DataNodes负责处理来自Clients的读写请">
+<meta property="og:description" content="HDFS有一个主&#x2F;从架构，一个HDFS集群由一个单一的NameNode，它是管理文件系统命名空间的主服务器，并管理客户对文件的访问。NameNode执行文件系统命名空间操作，如打开，关闭和重命名文件和目录。它还确定块到DataNode的映射关系。   此外，还有许多的DataNode(通常每个节点一个)，它们管理所在的节点的数据存储。DataNodes负责处理来自Clients的读写请求。同">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/HDFS-Architecture/HDFSArchitecture.png">
 <meta property="og:image" content="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/HDFS-Architecture/HDFSDataReplication.png">
@@ -21,261 +33,619 @@
 <meta property="article:tag" content="Hadoop">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/HDFS-Architecture/HDFSArchitecture.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://example.com/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
   
-    <link rel="shortcut icon" href="/favicon.png">
-  
-  
-    
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
-
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
   
   
 <link rel="stylesheet" href="/css/style.css">
 
   
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
-
+  
+  
   
 <meta name="generator" content="Hexo 6.1.0"></head>
 
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Hexo</a>
-      </h1>
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
       
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/larsonll" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Larson</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Data Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Shanghai, China</small>
       </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
     </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">Repository</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">Books</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">Links</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/larsonll" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/cofess" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="https://twitter.com/iwebued" target="_blank" title="Twitter" data-toggle=tooltip data-placement=top><i class="icon icon-twitter"></i></a></li>
+        
+        <li><a href="https://www.behance.net/cofess" target="_blank" title="Behance" data-toggle=tooltip data-placement=top><i class="icon icon-behance"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
   </div>
 </header>
 
-      <div class="outer">
-        <section id="main"><article id="post-HDFS-Architecture-HDFS-架构" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/" class="article-date">
-  <time class="dt-published" datetime="2022-04-13T11:22:06.000Z" itemprop="datePublished">2022-04-13</time>
-</a>
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/" rel="tag">Oracle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Hadoop/" style="font-size: 13px;">Hadoop</a> <a href="/tags/Oracle/" style="font-size: 13px;">Oracle</a> <a href="/tags/spark/" style="font-size: 13px;">spark</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/13/Refresh-Materialized-View/" class="title">Refresh Materialized View</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-13T11:36:38.000Z" itemprop="datePublished">2022-04-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/13/Spark-Evn-Deployment-Spark-%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" class="title">Spark Evn Deployment(Spark 环境部署)</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-13T11:29:03.000Z" itemprop="datePublished">2022-04-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/" class="title">HDFS Architecture(HDFS 架构)</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-13T11:22:06.000Z" itemprop="datePublished">2022-04-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/13/blog-test/" class="title">blog test</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-13T06:09:24.000Z" itemprop="datePublished">2022-04-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/12/hello-world/" class="title">Hello World</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-12T10:03:52.260Z" itemprop="datePublished">2022-04-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
     
   </div>
-  <div class="article-inner">
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-HDFS-Architecture-HDFS-架构" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
     
-    
-      <header class="article-header">
+    <div class="article-header">
+      
         
   
-    <h1 class="p-name article-title" itemprop="headline name">
+    <h1 class="article-title" itemprop="name">
       HDFS Architecture(HDFS 架构)
     </h1>
   
 
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
       
-        <p><img src="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/HDFS-Architecture/HDFSArchitecture.png" alt="HDFS Architecture"></p>
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/" class="article-date">
+	  <time datetime="2022-04-13T11:22:06.000Z" itemprop="datePublished">2022-04-13</time>
+	</a>
+</span>
+        
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Hadoop/" rel="tag">Hadoop</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/#comments" class="article-comment-link">Comments</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/HDFS-Architecture/HDFSArchitecture.png" alt="HDFS Architecture" /></p>
 <ul>
-<li><p>HDFS有一个主&#x2F;从架构，一个HDFS集群由一个单一的NameNode，它是管理文件系统命名空间的主服务器，并管理客户对文件的访问。NameNode执行文件系统命名空间操作，如打开，关闭和重命名文件和目录。它还确定块到DataNode的映射关系。</p>
+<li>
+<p>HDFS有一个主/从架构，一个HDFS集群由一个单一的NameNode，它是管理文件系统命名空间的主服务器，并管理客户对文件的访问。NameNode执行文件系统命名空间操作，如打开，关闭和重命名文件和目录。它还确定块到DataNode的映射关系。</p>
 </li>
-<li><p>此外，还有许多的DataNode(通常每个节点一个)，它们管理所在的节点的数据存储。DataNodes负责处理来自Clients的读写请求。同时再NameNode的指令下执行Block的创建，删除，复制。</p>
+<li>
+<p>此外，还有许多的DataNode(通常每个节点一个)，它们管理所在的节点的数据存储。DataNodes负责处理来自Clients的读写请求。同时再NameNode的指令下执行Block的创建，删除，复制。</p>
 </li>
-<li><p>HDFS 公开一个命名空间，允许用户数据存储再文件中。再内部文件被分割成一个或者多个数据块，这些数据块存储再DataNode集群中。</p>
+<li>
+<p>HDFS 公开一个命名空间，允许用户数据存储再文件中。再内部文件被分割成一个或者多个数据块，这些数据块存储再DataNode集群中。</p>
 </li>
-<li><p>典型的HDFS集群，会有一个专用的机器来运行NameNode，其他机器都运行一个DataNode实例。</p>
+<li>
+<p>典型的HDFS集群，会有一个专用的机器来运行NameNode，其他机器都运行一个DataNode实例。</p>
 </li>
 </ul>
 <p>Note: 集群中单个NameNode的存在极大地简化了系统的架构，NameNode是所有HDFS元数据的仲裁器和存储库。用户的数据是永远不会通过NameNode。</p>
-<h3 id="文件系统命名空间"><a href="#文件系统命名空间" class="headerlink" title="文件系统命名空间"></a>文件系统命名空间</h3><ul>
+<h3 id="文件系统命名空间"><a class="markdownIt-Anchor" href="#文件系统命名空间"></a> 文件系统命名空间</h3>
+<ul>
 <li>HDFS的文件系统类似于传统的分层结构，用户同样可以创建目录并且在目录下创建文件、删除文件，移动文件或者重命名文件. HDFS2.6.5目前还不支持对用户进行分配额度或者访问权限，以及文件间的软硬链接。未来可能会有这种功能。</li>
 <li>NameNode维护文件系统命名空间，对其的任何更改都会进行记录。</li>
 <li>可以指定一个文件的副本数量。一般为3份。 文件的拷贝数称为文件的复制因子。可以由参数指定。</li>
 </ul>
-<h1 id="数据复制-Data-Replication"><a href="#数据复制-Data-Replication" class="headerlink" title="数据复制(Data Replication)"></a>数据复制(Data Replication)</h1><p>HDFS在集群中存储大文件，将每个文件存储为快序列。一个文件的所有的块除了最后一个block 其他的block 都是一样的大小。<br>每个文件的复制因子(备份) 的数量是可以指定的。</p>
-<p><img src="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/HDFS-Architecture/HDFSDataReplication.png" alt="Data Replication"></p>
-<h2 id="副本放置策略"><a href="#副本放置策略" class="headerlink" title="副本放置策略"></a>副本放置策略</h2><p>HDFS的数据复制对提高其可靠性和性能至关重要。</p>
-<h3 id="机架感知策略"><a href="#机架感知策略" class="headerlink" title="机架感知策略"></a>机架感知策略</h3><ul>
+<h1 id="数据复制data-replication"><a class="markdownIt-Anchor" href="#数据复制data-replication"></a> 数据复制(Data Replication)</h1>
+<p>HDFS在集群中存储大文件，将每个文件存储为快序列。一个文件的所有的块除了最后一个block 其他的block 都是一样的大小。<br />
+每个文件的复制因子(备份) 的数量是可以指定的。</p>
+<p><img src="https://github-hexo-picturebed.s3.ap-southeast-1.amazonaws.com/story/HDFS-Architecture/HDFSDataReplication.png" alt="Data Replication" /></p>
+<h2 id="副本放置策略"><a class="markdownIt-Anchor" href="#副本放置策略"></a> 副本放置策略</h2>
+<p>HDFS的数据复制对提高其可靠性和性能至关重要。</p>
+<h3 id="机架感知策略"><a class="markdownIt-Anchor" href="#机架感知策略"></a> 机架感知策略</h3>
+<ul>
 <li>比如副本数量指定为3时。 HDFS的放置策略是将一个副本放在本地机架的一个node上，另一个副本放在本地机架的另一个node上。最后一个副本放在另一个机架的另一个节点上。</li>
 <li>这种策略减少了机架间的写流量，提高写性能。机架间的故障概率远小于节点故障的概率。这个策略，文件的副本就不会均匀分布再各个机架上。三分之一的副本再一个节点上，三分之二的副本再一个架子上，另外三分之一均匀分布在剩下的架子上。</li>
 <li>这种策略改进了写性能，而不影响数据可靠性或读性能。</li>
 </ul>
-<h2 id="副本选择"><a href="#副本选择" class="headerlink" title="副本选择"></a>副本选择</h2><ul>
+<h2 id="副本选择"><a class="markdownIt-Anchor" href="#副本选择"></a> 副本选择</h2>
+<ul>
 <li>为了最小化带宽消耗和读取延迟，在一个读取请求过来的时候，如果在读取节点所在机架上存在一个请求的副本，那么这个副本更适合提供读取请求。</li>
 </ul>
-<h2 id="安全模式"><a href="#安全模式" class="headerlink" title="安全模式"></a>安全模式</h2><ul>
+<h2 id="安全模式"><a class="markdownIt-Anchor" href="#安全模式"></a> 安全模式</h2>
+<ul>
 <li>在集群启动的时候，NameNode会进入一种Safemode(安全模式)的特殊状态。这时候是不会发生数据库复制的。只有当NameNode接收到DataNodes的心跳和block report后。 Block报告包含DataNodes管理的所有的数据块的列表。NameNode会检查数据块的最小复制数、在检查数据快复制百分比之后。退出安全模式。</li>
 <li>这时候确定仍然少于指定的副本数量。NameNode 会将这些块按照对应的策略复制到其他的DataNode。</li>
 </ul>
 
       
     </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/" data-id="cl1xidjrp0000jgvp7ye2dtpf" data-title="HDFS Architecture(HDFS 架构)" class="article-share-link">Share</a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a></li></ul>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://example.com/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/" title="HDFS Architecture(HDFS 架构)" target="_blank" rel="external">http://example.com/2022/04/13/HDFS-Architecture-HDFS-架构/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
 
-    </footer>
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/larsonll" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/larsonll" target="_blank"><span class="text-dark">Larson</span><small class="ml-1x">Data Developer &amp; Designer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
   </div>
+</div>
+
+
+    </div>
+  </article>
   
     
-<nav id="article-nav">
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
   
-    <a href="/2022/04/13/Spark-Evn-Deployment-Spark-%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          Spark Evn Deployment(Spark 环境部署)
-        
-      </div>
-    </a>
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/04/13/Spark-Evn-Deployment-Spark-%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/" title="Spark Evn Deployment(Spark 环境部署)"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/04/13/blog-test/" title="blog test"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
   
   
-    <a href="/2022/04/13/blog-test/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">blog test</div>
-    </a>
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>$</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
   
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
 </nav>
-
   
-</article>
-
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hadoop/" rel="tag">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Oracle/" rel="tag">Oracle</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Oracle/" style="font-size: 10px;">Oracle</a> <a href="/tags/spark/" style="font-size: 10px;">spark</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2022/04/13/Refresh-Materialized-View/">Refresh Materialized View</a>
-          </li>
-        
-          <li>
-            <a href="/2022/04/13/Spark-Evn-Deployment-Spark-%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2/">Spark Evn Deployment(Spark 环境部署)</a>
-          </li>
-        
-          <li>
-            <a href="/2022/04/13/HDFS-Architecture-HDFS-%E6%9E%B6%E6%9E%84/">HDFS Architecture(HDFS 架构)</a>
-          </li>
-        
-          <li>
-            <a href="/2022/04/13/blog-test/">blog test</a>
-          </li>
-        
-          <li>
-            <a href="/2022/04/12/hello-world/">Hello World</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>Maybe you could buy me a cup of coffee.</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="Scan Qrcode" title="Scan" />
+              </div>
+              <p class="text-muted mv">Scan this qrcode</p>
+              <p class="text-grey">Open alipay app scan this qrcode, buy me a coffee!</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="Scan Qrcode" title="Scan" />
+              </div>
+              <p class="text-muted mv">Scan this qrcode</p>
+              <p class="text-grey">Open wechat app scan this qrcode, buy me a coffee!</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> alipay</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> wechat payment</a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      
-      &copy; 2022 John Doe<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/larsonll" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="http://weibo.com/cofess" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+        <li><a href="https://twitter.com/iwebued" target="_blank" title="Twitter" data-toggle=tooltip data-placement=top><i class="icon icon-twitter"></i></a></li>
+        
+        <li><a href="https://www.behance.net/cofess" target="_blank" title="Behance" data-toggle=tooltip data-placement=top><i class="icon icon-behance"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
 </footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
 
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
     
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
 
 
-<script src="/js/jquery-3.4.1.min.js"></script>
-
-
-
-  
-<script src="/fancybox/jquery.fancybox.min.js"></script>
-
-
-
-
-<script src="/js/script.js"></script>
 
 
 
 
 
-  </div>
 </body>
 </html>
